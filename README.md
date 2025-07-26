@@ -1,34 +1,45 @@
-# make an assembler for the Hack computer of Nand2Tetris
-# first, make the list of symbols, mapping them to numbers
-# second, map symbols to numbers for instructions 
-# finally, decode all
+# 🧠 Hack Assembler (Nand2Tetris Project)
 
-# MAKING A CLASSIFIER
-# if line == "" or line.startswith("//"):
-#     # Ignore blank or comment lines
-# elif line.startswith("(") and line.endswith(")"):
-#     # It's a label declaration (pseudo-instruction)
-# elif line.startswith("@"):
-#     # It's an A-instruction
-#         # It's a direct address (e.g., @10)
-#     else:
-#         # It's a variable or predefined symbol (e.g., @i)
-# else:
-#     # It's a C-instruction (e.g., D=M, D;JGT, M=D+1;JMP)
+This is a Python implementation of an **assembler** for the **Hack computer**, part of the [Nand2Tetris](https://www.nand2tetris.org/) course.
 
-# MAKING A LINE CLEANER 
-# we need line_cleaning to convert into stuff that matters first
-# MAKE THE ASM PARSER 
-# after knowing how to clean a line, 
-# we make it able to clena the whole file 
+---
 
-# MAKING THE FIRST PASS ASSEMBLER
-# we make the dictionary of symbols 
-# rom-addresses start at 0
-# dont forget the predefined ones
+## 🛠️ Assembler Workflow
 
-# with open("output.hack", "w") as f:
-    # for line in binary_lines:
-    #     f.write(line + "\n")
-# with open("input.asm", "r") as f:
-#     test_lines=f.readlines()
+The assembler performs the following steps:
+
+---
+
+### 1. Symbol Table Creation (First Pass)
+
+- Parse each line to:
+  - **Ignore** blank lines and comments (`// ...`)
+  - **Handle labels** (e.g. `(LOOP)`) by mapping them to the ROM address of the following instruction
+- Predefined symbols like `R0` to `R15`, `SCREEN`, `KBD`, and others are initialized
+
+---
+
+### 2. Instruction Parsing (Second Pass)
+
+Each line is classified as:
+
+- **A-instruction** (`@value`)
+  - If `value` is numeric: directly convert to binary
+  - If `value` is a symbol: resolve it via the symbol table (add to table if it's a new variable)
+  
+- **C-instruction** (`dest=comp;jump`)
+  - Parse and translate using lookup tables for `dest`, `comp`, and `jump` fields
+
+---
+
+### 3. Line Classifier Logic
+
+```python
+if line == "" or line.startswith("//"):
+    # Skip blank lines and comments
+elif line.startswith("(") and line.endswith(")"):
+    # Label (pseudo-instruction)
+elif line.startswith("@"):
+    # A-instruction: either direct number or symbol
+else:
+    # C-instruction
