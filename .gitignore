@@ -1,6 +1,5 @@
 # Assembled output files
 output.hack
-*.hack
 
 # Python cache files
 __pycache__/

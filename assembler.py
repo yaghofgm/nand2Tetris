@@ -5,7 +5,7 @@ from main_code import first_pass, second_pass
 def main():
     parser = argparse.ArgumentParser(description='Hack Assembler')
     # Add "input" to choices and keep strings
-    parser.add_argument('--f', type=str, choices=["input", "mult", "fill"])
+    parser.add_argument('--f', type=str, choices=["input", "mult", "fill","pong"])
     args = parser.parse_args()
     # Map flags to files - use args.f (not args.flag)
     if args.f == "input":
@@ -14,6 +14,8 @@ def main():
         input_file = "Mult.asm"
     elif args.f == "fill":
         input_file = "Fill.asm"
+    elif args.f == "pong":
+        input_file = "PongL.asm"
     else:
         # Default to input.asm if no flag provided
         input_file = "input.asm"
