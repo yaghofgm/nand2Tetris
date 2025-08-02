@@ -1,17 +1,4 @@
-# Assembled output files
-output.hack
+# Ignore projects and tools
+/projects/
+/tools/
 
-# Python cache files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# IDE files
-.vscode/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
