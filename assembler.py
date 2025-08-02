@@ -29,7 +29,7 @@ def main():
         lines = second_pass(parsed, symbols)
         f.write("\n".join(lines))
     
-    print(f"Successfully assembled {input_file} to output.hack")
+    # print(f"Successfully assembled {input_file} to output.hack")
 
 if __name__ == "__main__":
     main()
