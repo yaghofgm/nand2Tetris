@@ -1,0 +1,25 @@
+# Normalize text files to LF in repo; keep consistent across Windows/Linux/WSL
+* text=auto eol=lf
+
+# Windows batch files should use CRLF when checked out on Windows
+*.bat text eol=crlf
+
+# Shell scripts and code files
+*.sh  text eol=lf
+*.py  text eol=lf
+*.md  text eol=lf
+*.asm text eol=lf
+*.vm  text eol=lf
+*.hdl text eol=lf
+*.tst text eol=lf
+*.cmp text eol=lf
+*.jack text eol=lf
+*.gitignore text eol=lf
+
+# Binary files (do not modify line endings)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary
+*.jar binary
