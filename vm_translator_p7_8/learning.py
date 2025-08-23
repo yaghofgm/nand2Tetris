@@ -31,6 +31,18 @@ class Parser:
                 return "C_POP"
             case "add" | "sub"| "neg"|"eq"|"gt"|"lt"|"and"|"or"|"not":
                 return "C_ARITHMETIC"
+            case "label":
+                return "C_LABEL"
+            case "goto":
+                return "C_GOTO"
+            case "if-goto":
+                return "C_IF"
+            case "function":
+                return "C_FUNCTION"
+            case "call":
+                return "C_CALL"
+            case "return":
+                return "C_RETURN"
             case _:
                 return "UNKNOWN"
 
@@ -94,6 +106,8 @@ class CodeWriter:
             "not":"M=!M"
         }
         self._label_counter=0
+        self._current_function=""
+        self._ret_counter_by_func = {}
     
     def close(self)->None:
         self._f.close()
@@ -223,3 +237,64 @@ M=D"""
             self._write_block(asm_code + "\n" + pop_end)
         else:
             self._f.write(f"// ERROR, neither pop nor push : {ctype}\n")
+        
+    def writeLabel(self,arg1:str)->None:
+        asm_code=f"({self._current_function}${arg1})" #the current function will already be compiled as filename.functionName 
+        self._write_block(asm_code)
+    
+    def writeGoto(self,arg1:str)->None:
+        asm_code=f"""@{self._current_function}${arg1}
+0;JMP"""
+        self._write_block(asm_code)
+    
+    def writeIf(self,arg1:str)->None:
+        asm_code=f"""@SP
+AM=M-1
+D=M
+@{self._current_function}${arg1}
+D;JNE"""
+        self._write_block(asm_code)
+    
+    def writeFunction(self,arg1:str,arg2:int)->None:
+        self._current_function=arg1
+        asm_code=f"({self._current_function})"
+        self._write_block(asm_code)
+        for _ in range(arg2):    
+            self.writePushPop("C_PUSH","constant",0)
+    
+    def writeCall(self,arg1:str,arg2:int)->None:
+        k=self._ret_counter_by_func.get(self._current_function,0) #get the number of returns of this function
+        ret = f"{self._current_function}$ret.{k}"
+        self._ret_counter_by_func[self._current_function] = k+1
+        asm_code=f"@{ret}\nD=A\n"+self._pushTail()
+        self._write_block(asm_code)
+        for word in ("LCL","ARG","THIS","THAT"):
+            asm_code=f"@{word}\nD=M\n"+self._pushTail()
+            self._write_block(asm_code)
+        asm_code=f"""@SP
+D=M
+@{arg2}
+D=D-A
+@5
+D=D-A
+@ARG
+M=D
+@SP
+D=M
+@LCL
+M=D
+@{arg1}
+0;JMP
+({ret})"""
+        self._write_block(asm_code)
+    def _pushTail(self)->str:
+        asm_code="""@SP
+A=M
+M=D
+@SP
+M=M+1"""
+        return asm_code
+
+    def writeReturn(self)->None:
+        return 
+    

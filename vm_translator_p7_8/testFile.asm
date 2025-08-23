@@ -1,0 +1,8 @@
+($LOOP)
+@SP
+AM=M-1
+D=M
+@$LOOP
+D;JNE
+@$LOOP
+0;JMP

@@ -23,9 +23,18 @@ def main():
                 codeWriter.writeArithmetic(arg1)
             case "C_PUSH" | "C_POP":
                 codeWriter.writePushPop(ctype, arg1, arg2)
-            # case "C_LABEL":
-            #     codeWriter.writeLabel(arg1)
-            # case ... ← Future cases in Project 8
+            case "C_LABEL":
+                codeWriter.writeLabel(arg1)
+            case "C_GOTO":
+                codeWriter.writeGoto(arg1)
+            case "C_IF":
+                codeWriter.writeIf(arg1)
+            case "C_FUNCTION":
+                codeWriter.writeFunction(arg1, arg2)
+            case "C_CALL":
+                codeWriter.writeCall(arg1, arg2)
+            case "C_RETURN":
+                codeWriter.writeReturn()
             case "UNKNOWN":
                 print(f"Unknown command: {parser.current_command}")
     codeWriter.close()
