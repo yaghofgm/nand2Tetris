@@ -1,4 +1,4 @@
-Nand2Tetris — course solutions and tools
+# Nand2Tetris — course solutions and tools
 
 This repo contains my solutions and small utilities for the Nand2Tetris course.
 
