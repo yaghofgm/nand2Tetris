@@ -1,4 +1,4 @@
-VM Translator (Projects 7–8)
+# VM Translator ((Nand2Tetris Project) Projects 7–8)
 
 Translate Hack VM code to Hack assembly. One required flag controls everything:
 
