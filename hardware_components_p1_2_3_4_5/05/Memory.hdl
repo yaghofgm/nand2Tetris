@@ -1,0 +1,45 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/Memory.hdl
+/**
+ * The complete address space of the Hack computer's memory,
+ * including RAM and memory-mapped I/O. 
+ * The chip facilitates read and write operations, as follows:
+ *     Read:  out(t) = Memory[address(t)](t)
+ *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
+ * In words: the chip always outputs the value stored at the memory 
+ * location specified by address. If load=1, the in value is loaded 
+ * into the memory location specified by address. This value becomes 
+ * available through the out output from the next time step onward.
+ * Address space rules:
+ * Only the upper 16K+8K+1 words of the Memory chip are used. 
+ * Access to address>0x6000 is invalid and reads 0. Access to any address
+ * in the range 0x4000-0x5FFF results in accessing the screen memory 
+ * map. Access to address 0x6000 results in accessing the keyboard 
+ * memory map. The behavior in these addresses is described in the Screen
+ * and Keyboard chip specifications given in the lectures and the book.
+ */
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    //have mux pointing to each one
+    //0x4000 is 1000000, 0x6000 is 1100000. easy to distinguish and mux
+    //our 16K ram goes 14 bit address, from 0 to 13
+    //maybe 0X, 10, 11
+    //address[14]? no= loadRAM with [13:0]
+    //             yes= address[13]? no= address[12]? no= loadSmallscreen with [11:0]
+    //                                                yes= loadBigscreen with [11:0]
+    //                               yes= loadRegister
+    DMux(in=load, sel=address[14], a=load0X, b= load1X);
+    DMux(in=load1X, sel=address[13], a=load10X, b=load11);
+
+    RAM16K(in=in, load=load0X, address=address[0..13] , out=outRAM);
+    Screen(in=in, load=load10X,address=address[0..12] , out=outScreen);
+    Keyboard(out=outKBD);
+
+    Mux16(a=outScreen, b=outKBD, sel=address[13], out=outNotRAM);
+    Mux16(a=outRAM, b=outNotRAM, sel=address[14], out=out);
+}
