@@ -1,61 +1,64 @@
-VM Translator (Project 7)
+VM Translator (Projects 7–8)
 
-Small, single-file VM-to-Hack translator for the Nand2Tetris course. It reads a .vm file and writes the corresponding Hack assembly .asm next to it.
+Translate Hack VM code to Hack assembly. One required flag controls everything:
 
-Supported (Project 7 scope)
+- Required: --path <path>
+	- If <path> is a folder: translate all .vm files inside it into a single <folder>.asm and include bootstrap.
+	- If <path> is a single .vm file: translate it into <file>.asm without bootstrap.
+
+Supported commands
 - Arithmetic/logical: add, sub, neg, eq, gt, lt, and, or, not
-- Memory access: push/pop for segments constant, local, argument, this, that, temp, pointer, static
-- Single input file only (no directories)
-
-Not yet supported (Project 8 features)
+- Memory access: push/pop for constant, local, argument, this, that, temp, pointer, static
 - Program flow: label, goto, if-goto
-- Function calling: function, call, return
+- Functions: function, call, return
 
 Requirements
-- Python 3.10+ (tested with 3.10)
+- Python 3.10+
 
-Quick start
-1) From the repo root, change into this folder.
-	 - Windows PowerShell:
-		 ```powershell
-		 cd vm_translator
-		 ```
-2) Run the translator on a .vm file. Output .asm will be created beside the input and will overwrite any existing file with the same name.
-	 - Windows PowerShell examples:
-		 ```powershell
-		 # Basic arithmetic test
-		 python .\main.py --file .\BasicTest.vm
-
-		 # Stack operations
-		 python .\main.py --file .\StackTest.vm
-
-		 # Pointer and static segment tests
-		 python .\main.py --file .\PointerTest.vm
-		 python .\main.py --file .\StaticTest.vm
-		 ```
-
-Expected outputs
-- This folder includes reference .asm files (e.g., BasicTest.asm, StackTest.asm, PointerTest.asm, StaticTest.asm).
-- Running the translator with the same .vm name will overwrite those files. If you want to compare your output to the references, either:
-	- Copy the .vm to a different filename before running (e.g., copy BasicTest.vm to BasicOut.vm), or
-	- Run the translator in another directory.
-
-Verifying your output (optional)
-- You can visually diff your generated .asm with the provided reference .asm.
-- The Nand2Tetris tools include TextComparer.bat you can use, e.g.:
-	```powershell
-	# Example if you generated .\out\BasicTest.asm and want to compare to the reference
-	..\tools\TextComparer.bat .\out\BasicTest.asm .\BasicTest.asm
+Usage (WSL/Linux shell)
+- From the repo root:
+	```bash
+	cd vm_translator_p7_8
 	```
 
-How it’s structured
-- main.py: CLI entry point. Usage: python main.py --file path/to/File.vm
-- learning.py:
-	- Parser: cleans input and classifies commands (C_ARITHMETIC, C_PUSH, C_POP)
-	- CodeWriter: emits Hack assembly for arithmetic and push/pop
+Folder mode — includes bootstrap
+- Use when your program has multiple .vm files or needs Sys.init (e.g., Project 8 function calls: SimpleFunction, NestedCall, FibonacciElement, StaticsTest).
+- Behavior:
+	- Writes <folder>.asm inside the folder.
+	- Emits bootstrap: sets SP=256 and calls Sys.init.
+	- Translates all .vm files in the folder (sorted by name).
+- Example:
+	```bash
+	python3 ./main.py --path ./SomeProgramFolder
+	# Produces: ./SomeProgramFolder/SomeProgramFolder.asm
+	```
 
-Notes
-- Output file name matches the input .vm name, with .asm extension.
-- The translator currently handles only one .vm file at a time.
-- No bootstrap code (Sys.init) is emitted.
+File mode — no bootstrap
+- Use for simple, single-file tests that don’t require Sys.init (e.g., BasicTest.vm, StackTest.vm, PointerTest.vm, StaticTest.vm).
+- Behavior:
+	- Writes <file>.asm next to the .vm file.
+	- Does not emit bootstrap.
+- Examples:
+	```bash
+	python3 ./main.py --path ./BasicTest.vm
+	python3 ./main.py --path ./StackTest.vm
+	python3 ./main.py --path ./PointerTest.vm
+	python3 ./main.py --path ./StaticTest.vm
+	```
+
+Notes and tips
+- Running again overwrites the existing .asm.
+- Static variables are file-scoped (Foo.vm -> symbols Foo.0, Foo.1, ...).
+- Labels inside functions are scoped as FunctionName$LABEL.
+- For multi-file programs that don’t define Sys.init, folder mode will still include bootstrap and then jump to Sys.init (ensure it exists in the inputs if required by the test).
+
+Project structure
+- main.py: CLI entry point (parses --path, decides folder vs file, runs translator).
+- learning.py: Parser and CodeWriter (emits Hack assembly for all Project 7–8 commands; adds bootstrap in folder mode via writeInit).
+
+Compare outputs (optional)
+- Use the Nand2Tetris TextComparer (shell version) to diff against references if you have them:
+	```bash
+	../tools/TextComparer.sh ./out/YourOutput.asm ./reference/Expected.asm
+	```
 

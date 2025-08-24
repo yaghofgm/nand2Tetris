@@ -296,5 +296,72 @@ M=M+1"""
         return asm_code
 
     def writeReturn(self)->None:
-        return 
+        asm_code="""@LCL
+D=M
+@R13
+M=D
+@5
+D=A
+@R13
+A=M-D
+D=M
+@R14
+M=D
+@SP
+AM=M-1
+D=M
+@ARG
+A=M
+M=D
+@ARG
+D=M
+@SP
+M=D+1
+@1
+D=A
+@R13
+A=M-D
+D=M
+@THAT
+M=D
+@2
+D=A
+@R13
+A=M-D
+D=M
+@THIS
+M=D
+@3
+D=A
+@R13
+A=M-D
+D=M
+@ARG
+M=D
+@4
+D=A
+@R13
+A=M-D
+D=M
+@LCL
+M=D
+@R14
+A=M
+0;JMP"""
+        self._write_block(asm_code)
+    
+    def writeInit(self)->None:
+        asm_code="""@256
+D=A
+@SP
+M=D"""
+        self._write_block(asm_code)
+        self.writeCall("Sys.init",0)
+    
+    def setFileName(self, vm_path: str) -> None:
+        base = os.path.splitext(os.path.basename(vm_path))[0]
+        self._filename = base                 # for static: base.i
+        if not self._current_function:        # for ProgramFlow labels: base$LABEL
+            self._current_function = base
+
     

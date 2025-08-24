@@ -1,3 +1,8 @@
-label LOOP
-if-goto LOOP
-goto LOOP
+function Main.Simpletest 2
+push constant 31
+push constant 1
+add
+return
+function Sys.init 0
+    call Main.Simpletest 0   // computes the 4'th fibonacci element
+    return
